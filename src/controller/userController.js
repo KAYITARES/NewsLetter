@@ -1,29 +1,34 @@
 import User from "../model/User";
+import bcrypt, { hash } from 'bcrypt';
+import errorResponse from "../utils/errorResponse";
+import successResponse from "../utils/successResponse";
 
 class UserController {
   static async createUser(req, res) {
+    const {firstName,lastName,email,password}=req.body
     try {
 
         if(req.body.password!==req.body.confirmPassword){
-            return res.status(403).json({
-                message:"Password and confirm password is not matched"
-            })
+            return errorResponse(res,403,`Password and confirm password is not matched`)
+          
+          
         }
-      const user = await User.create(req.body);
-      return res.status(201).json({
-        message: `user successfuly created`,
-        data: user,
-      });
+     
+        const hashPassword=bcrypt.hashSync(req.body.password,10)
+
+      const user = await User.create({firstName,lastName,email,password:hashPassword});
+     const status=201
+
+     const msg=`user successfuly created`
+     const data=user
+     successResponse(res,status,msg,data)
     } catch (error) {
       if (error.code == 11000) {
-        return res.status(403).json({
-          message: `User already exist`,
-        });
+        return errorResponse(res,403,`User already exist`)
+       
       } else {
-        return res.status(500).json({  
-            message:`all ${users.length} Users Found`,
-     
-        })
+        return errorResponse(res,500,error)
+       
       
       }
     }
@@ -31,22 +36,33 @@ class UserController {
   static async getAllUsers(req,res){
     const users= await User.find();
     if(!users || users.length==0){
-        return res.status(401).json({
-            message:'no user found'
-        })
+      return errorResponse(res,401,'no user found')
+      
     }else if(users){
-        return res.status(200).json({
-            message:`all ${users.length} Users Found`,
-            data:users
-        })
+      const status=200
+      const msg=`all ${users.length} Users Found`
+      const data=users
+      return successResponse(res,status,msg,data)
+      
     }
   }
   static async deleteAllUsers(req,res){
     const users=await User.deleteMany()
-    return res.status(200).json({
-        message:'all users delete',
-        data:users
-    })
+    return successResponse(res,200,'alll users deleted',users)
+   
+  }
+  static async getOneUser(req,res){
+    const id=req.params.ido
+    const user=await User.findById(id)
+    if(!user){
+      return errorResponse(res,401,`no user found with that id : ${id}`)
+  
+    }else{
+
+   return successResponse(res,200,`user successfuly retrieved`,user)
+    }
+
+
   }
 }
 export default UserController;

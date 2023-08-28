@@ -5,6 +5,7 @@ const router=express.Router()
 
 router.post("/",userController.createUser)
 router.get("/",userController.getAllUsers)
-router.delete('/delete/all',userController.deleteAllUsers)
+router.delete('/',userController.deleteAllUsers)
+router.get('/:ido',userController.getOneUser)
 
 export default router
