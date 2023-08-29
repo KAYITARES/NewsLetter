@@ -5,7 +5,7 @@ import successResponse from "../utils/successResponse";
 
 class UserController {
   static async createUser(req, res) {
-    const {firstName,lastName,email,password}=req.body
+    const {firstName,lastName,email,password,role}=req.body
     try {
 
         if(req.body.password!==req.body.confirmPassword){
@@ -16,7 +16,7 @@ class UserController {
      
         const hashPassword=bcrypt.hashSync(req.body.password,10)
 
-      const user = await User.create({firstName,lastName,email,password:hashPassword});
+      const user = await User.create({firstName,lastName,email,password:hashPassword,role});
      const status=201
 
      const msg=`user successfuly created`
@@ -63,6 +63,24 @@ class UserController {
     }
 
 
+  }
+  static async deleteOneUser(req,res){
+    const id=req.params.id
+    const user= await User.findByIdAndDelete(id)
+    if(!user){
+      errorResponse(res,401,`user with id ${id} not found`)
+    }else{
+      successResponse(res,200,`user successfuly deleted`,user)
+    }
+  }
+  static async updateUser(req,res){
+    const id=req.params.id
+    const user=await User.findByIdAndUpdate(id,req.body,{new:true})
+    if(!user){
+      errorResponse(res,401,`user with id ${id} not found`)
+    }else{
+      successResponse(res,200,`user successfuly updated`,user)
+    }
   }
 }
 export default UserController;
