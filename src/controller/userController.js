@@ -8,7 +8,7 @@ class UserController {
     const {firstName,lastName,email,password,role}=req.body
     try {
 
-        if(req.body.password!==req.body.confirmPassword){
+        if(password!==req.body.confirmPassword){
             return errorResponse(res,403,`Password and confirm password is not matched`)
           
           
@@ -44,7 +44,7 @@ class UserController {
       const data=users
       return successResponse(res,status,msg,data)
       
-    }
+    }er
   }
   static async deleteAllUsers(req,res){
     const users=await User.deleteMany()
