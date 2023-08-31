@@ -2,6 +2,7 @@ import User from "../model/User";
 import bcrypt, { hash } from 'bcrypt';
 import errorResponse from "../utils/errorResponse";
 import successResponse from "../utils/successResponse";
+import jwt from "jsonwebtoken"
 
 class UserController {
   static async createUser(req, res) {
@@ -30,6 +31,32 @@ class UserController {
         return errorResponse(res,500,error)
        
       
+      }
+    }
+  }
+  static async login(req,res){
+    //take data from body
+    const {email,password}=req.body
+    //verify if email exist
+    const user=await User.findOne({email})
+    if(!user){
+      return errorResponse(res,401,`Invalid email or password`)
+    }else{
+      //verify password
+      const comparePassword=bcrypt.compareSync(password,user.password)
+      if(!comparePassword){
+        return errorResponse(res,401,`Invalid email or password`)
+      }else{
+        //generate a token
+        const token=jwt.sign({role:user.role,email:user.email,firstName:user.firstName},process.env.SECRET_KEY,{expiresIn:"1d"})
+return res.status(200).json({
+  token:token,
+  data:{
+    email:user.email,
+    firstName:user.firstName,
+    role:user.role
+  }
+})
       }
     }
   }
