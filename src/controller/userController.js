@@ -24,14 +24,10 @@ class UserController {
      const data=user
      successResponse(res,status,msg,data)
     } catch (error) {
-      if (error.code == 11000) {
-        return errorResponse(res,403,`User already exist`)
-       
-      } else {
-        return errorResponse(res,500,error)
-       
       
-      }
+        return errorResponse(res,403,error)
+       
+     
     }
   }
   static async login(req,res){
