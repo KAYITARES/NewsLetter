@@ -6,15 +6,16 @@ class Validator{
         const error=validationResult(req)
       if(!error==error.isEmpty()){
         error.errors.map((err)=>{
-            errorResponse(res,401,err.msg)
-          
+            return errorResponse(res,401,err.msg) 
         })
  
       }else{
         return next()
       }
+      
 
     }
+  
     static userAccountRule(){
         return [
             check("firstName","Please write your firstName correctly").trim().isAlpha(),
@@ -22,6 +23,7 @@ class Validator{
             check("password","Provide strong password").trim().isStrongPassword()
         ]
     }
+  
 
 }
 export default Validator

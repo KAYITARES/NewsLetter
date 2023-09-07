@@ -18,11 +18,13 @@ class UserController {
         const hashPassword=bcrypt.hashSync(req.body.password,10)
 
       const user = await User.create({firstName,lastName,email,password:hashPassword,role});
-     const status=201
-
-     const msg=`user successfuly created`
-     const data=user
-     successResponse(res,status,msg,data)
+    
+     if(!user){
+      return errorResponse(res,401,`user not created`)
+     }else{
+      return  successResponse(res,201,`user successfuly created`,user)
+     }
+   
     } catch (error) {
       
         return errorResponse(res,403,error)
