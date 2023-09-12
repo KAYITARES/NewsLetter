@@ -23,7 +23,20 @@ const NewsSchema=new mongoose.Schema({
     postedAt:{
         type:Date,
         default:Date.now()
-    }
+    },
+    comment:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Comment"
+        }
+    ]
+})
+NewsSchema.pre(/^find/,function(next){
+    this.populate({
+        path:"comment",
+        select:"comment postedAt"
+    })
+    next()
 })
 
 const News=mongoose.model("News",NewsSchema)

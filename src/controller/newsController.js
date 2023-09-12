@@ -55,7 +55,8 @@ class NewsController {
         if(!news){
             return errorResponse(res,401,`news with id ${id} not found`)
         }else{
-            return successResponse(res,200,`news successfuly retrieved `,news)
+          
+            return successResponse(res,200,`news successfuly retrieved with ${news.comment.length} comments`,news)
         }
         
     } catch (error) {
