@@ -34,7 +34,9 @@ class NewsController {
 
   static async updateNews(req, res) {
     const { id } = req.params;
-    const news = await News.findByIdAndUpdate({ _id: id }, req.body,{new:true});
+    const news = await News.findByIdAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
     try {
       if (!news) {
         return errorResponse(res, 401, `news not updated`);
@@ -42,35 +44,60 @@ class NewsController {
         return successResponse(res, 200, `News successfuly updated`, news);
       }
     } catch (error) {
-        return errorResponse(res,404,error)
+      return errorResponse(res, 404, error);
     }
   }
 
   //get one news
 
-  static async getOneNews(req,res){
-    const {id}=req.params;
-    const news=await News.findOne({_id:id})
+  static async getOneNews(req, res) {
+    const { id } = req.params;
+    const news = await News.findOne({ _id: id });
     try {
-        if(!news){
-            return errorResponse(res,401,`news with id ${id} not found`)
-        }else{
-          
-            return successResponse(res,200,`news successfuly retrieved with ${news.comment.length} comments`,news)
-        }
-        
+      if (!news) {
+        return errorResponse(res, 401, `news with id ${id} not found`);
+      } else {
+        return successResponse(
+          res,
+          200,
+          `news successfuly retrieved with ${news.comment.length} comments`,
+          news
+        );
+      }
     } catch (error) {
-        return errorResponse(res,404,error)
+      return errorResponse(res, 404, error);
     }
   }
-  static async deleteOneNews(req,res){
-    const id=req.params.id
-   const news=await News.findByIdAndDelete({_id:id})
-   if(!news){
-    return errorResponse(res,401,`news with id ${id} not found`)
-   }else{
-    return successResponse(res,200,`news successfuly deleted`,news)
-   }
+  static async like(req, res) {
+    const newsId = req.params.id;
+    const news = await News.findById({ _id: newsId });
+    if (!news) {
+      return errorResponse(res, 401, `News not found`);
+    } else {
+      news.likes += 1;
+      await news.save();
+      return successResponse(res, 200, `you liked ${news.likes}`, news);
+    }
+  }
+  static async dislike(req, res) {
+    const newsId = req.params.id;
+    const news = await News.findById({ _id: newsId });
+    if (!news) {
+      return errorResponse(res, 401, `News not found`);
+    } else {
+      news.dislikes += 1;
+      await news.save();
+      return successResponse(res, 200, `you disliked ${news.dislikes}`, news);
+    }
+  }
+  static async deleteOneNews(req, res) {
+    const id = req.params.id;
+    const news = await News.findByIdAndDelete({ _id: id });
+    if (!news) {
+      return errorResponse(res, 401, `news with id ${id} not found`);
+    } else {
+      return successResponse(res, 200, `news successfuly deleted`, news);
+    }
   }
 }
 export default NewsController;
