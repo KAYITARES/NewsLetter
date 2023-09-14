@@ -1,6 +1,8 @@
 import News from "../model/News";
 import errorResponse from "../utils/errorResponse";
 import successResponse from "../utils/successResponse";
+import sendEmail from "../utils/email";
+import User from "../model/User";
 
 class NewsController {
   //create a news
@@ -10,6 +12,10 @@ class NewsController {
       if (!news) {
         return errorResponse(res, 401, `News not created`);
       } else {
+        const users = await User.find();
+        users.map((user) => {
+          sendEmail(user, news);
+        });
         return successResponse(res, 201, `News successfuly Posted`, news);
       }
     } catch (error) {
