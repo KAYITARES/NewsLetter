@@ -74,15 +74,42 @@ class NewsController {
       return errorResponse(res, 404, error);
     }
   }
+  static async deleteAllNews(req, res) {
+    const news = await News.deleteMany();
+    return successResponse(res, 200, "alll news deleted", news);
+  }
   static async like(req, res) {
+    //take news id from params
     const newsId = req.params.id;
+    //find news id from news schema
     const news = await News.findById({ _id: newsId });
     if (!news) {
       return errorResponse(res, 401, `News not found`);
     } else {
-      news.likes += 1;
-      await news.save();
-      return successResponse(res, 200, `you liked ${news.likes}`, news);
+      //find user id from token
+      const userId = req.user._id;
+
+      //found if user id from likes is already exist
+      if (news.likes.includes(userId)) {
+        return errorResponse(res, 401, "you already like the news");
+      } else {
+        //find if the user Id is in dislike and remove it
+        if (news.dislikes.includes(userId)) {
+          news.dislikes.pull(userId);
+        }
+        //send user id into likes
+        news.likes.push(userId);
+        news.save();
+        return successResponse(
+          res,
+          200,
+          `like from ${req.user.firstName}`,
+          news
+        );
+      }
+      // news.likes += 1;
+      // await news.save();
+      // return successResponse(res, 200, `you liked ${news.likes}`, news);
     }
   }
   static async dislike(req, res) {
@@ -91,9 +118,21 @@ class NewsController {
     if (!news) {
       return errorResponse(res, 401, `News not found`);
     } else {
-      news.dislikes += 1;
-      await news.save();
-      return successResponse(res, 200, `you disliked ${news.dislikes}`, news);
+      const userId = req.user._id;
+      if (news.dislikes.includes(userId)) {
+        return errorResponse(res, 401, `you already disliked`);
+      }
+      if (news.likes.includes(userId)) {
+        news.likes.pull(userId);
+      }
+      news.dislikes.push(userId);
+      news.save();
+      return successResponse(
+        res,
+        200,
+        `you dislike ${req.user.firstName}`,
+        news
+      );
     }
   }
   static async deleteOneNews(req, res) {

@@ -23,14 +23,18 @@ const NewsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  likes: {
-    type: Number,
-    default: 0,
-  },
-  dislikes: {
-    type: Number,
-    default: 0,
-  },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  dislikes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   comment: [
     {
       type: mongoose.Schema.Types.ObjectId,
