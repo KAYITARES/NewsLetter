@@ -3,10 +3,16 @@ import errorResponse from "../utils/errorResponse";
 import successResponse from "../utils/successResponse";
 import sendEmail from "../utils/email";
 import User from "../model/User";
+import Category from "../model/Category";
 
 class NewsController {
   //create a news
   static async createNews(req, res) {
+    const categoryId = req.body.category;
+    const category = await Category.findById({ _id: categoryId });
+    if (!category) {
+      return errorResponse(res, 400, `no category with that id`);
+    }
     const news = await News.create(req.body);
     try {
       if (!news) {
@@ -21,6 +27,30 @@ class NewsController {
     } catch (error) {
       return errorResponse(res, 404, error);
     }
+  }
+  //search by category
+  static async searchCategory(req, res) {
+    const searchCategoryNews = req.query.category;
+
+    if (!searchCategoryNews) {
+      return errorResponse(res, 401, `no data provided in params`);
+    }
+    const news = await News.find();
+    const result = news.filter((x) => {
+      return x.category.categoryName
+        .toUpperCase()
+        .includes(searchCategoryNews.toUpperCase());
+    });
+
+    if (result.length == 0) {
+      return errorResponse(res, 401, `no news found`);
+    }
+    return successResponse(
+      res,
+      200,
+      `${result.length} news found ${searchCategoryNews}`,
+      result
+    );
   }
 
   //find all news
